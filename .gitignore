@@ -1,0 +1,7 @@
+venv/
+separated/
+*.mp3
+*.mp4
+*.bak*
+*.tmp
+*.docx

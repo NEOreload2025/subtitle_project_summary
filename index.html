@@ -3,182 +3,854 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>雙語字幕工廠｜LE SSERAFIM HOT 專案總結</title>
+  <title>NEO 的字幕計畫 ｜ LE SSERAFIM HOT 雙語字幕故事</title>
+  <meta name="description" content="一個 K-pop 粉絲 NEO，為了聽懂最愛偶像的歌詞，用 AI 工具自製雙語字幕的真實故事。不需要程式背景，也能看懂這段旅程。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <style>
-    :root{--bg:#0a0a0f;--card:#1a1a26;--border:#2a2a40;--a1:#7c5cfc;--a2:#fc5c9c;--a3:#5cf8fc;--gold:#ffd166;--green:#06d6a0;--text:#e8e8f0;--muted:#8888aa;}
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{background:var(--bg);color:var(--text);font-family:'Outfit','Noto Sans TC',sans-serif;min-height:100vh;overflow-x:hidden;}
-    .hero{position:relative;padding:80px 24px 60px;text-align:center;overflow:hidden;}
-    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(124,92,252,.35) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(252,92,156,.2) 0%,transparent 60%);pointer-events:none;}
-    .hero-badge{display:inline-block;background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 18px;border-radius:99px;margin-bottom:24px;}
-    .hero h1{font-size:clamp(2rem,6vw,4rem);font-weight:800;line-height:1.1;background:linear-gradient(135deg,#fff 30%,var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;}
-    .hero-sub{font-size:1rem;color:var(--muted);max-width:560px;margin:0 auto 40px;line-height:1.7;}
-    .hero-meta{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;}
-    .meta-item{display:flex;flex-direction:column;align-items:center;gap:4px;}
-    .meta-item .val{font-size:1.6rem;font-weight:700;color:var(--a3);}
-    .meta-item .lbl{font-size:.75rem;color:var(--muted);letter-spacing:.08em;}
-    .container{max-width:1100px;margin:0 auto;padding:0 24px 80px;}
-    .section-title{font-size:1.4rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
-    /* timeline */
-    .timeline{position:relative;padding-left:32px;margin-bottom:56px;}
-    .timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--a1),var(--a2),transparent);border-radius:2px;}
-    .tl-item{position:relative;margin-bottom:28px;}
-    .tl-dot{position:absolute;left:-26px;top:6px;width:12px;height:12px;border-radius:50%;border:2px solid var(--a1);background:var(--bg);transition:background .2s;}
-    .tl-item:hover .tl-dot{background:var(--a1);}
-    .tl-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;transition:border-color .2s,transform .2s;}
-    .tl-card:hover{border-color:var(--a1);transform:translateX(4px);}
-    .tl-version{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--a1);margin-bottom:4px;}
-    .tl-title{font-size:1rem;font-weight:600;margin-bottom:6px;}
-    .tl-desc{font-size:.875rem;color:var(--muted);line-height:1.65;}
-    .tl-tags{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;}
-    .tag{font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:99px;border:1px solid;}
-    .tag-p{color:var(--a1);border-color:var(--a1);} .tag-k{color:var(--a2);border-color:var(--a2);} .tag-c{color:var(--a3);border-color:var(--a3);} .tag-g{color:var(--gold);border-color:var(--gold);} .tag-n{color:var(--green);border-color:var(--green);}
-    /* arch */
-    .arch-flow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:56px;}
-    .arch-step{flex:1;min-width:150px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 12px;text-align:center;transition:transform .2s,border-color .2s;}
-    .arch-step:hover{transform:translateY(-4px);border-color:var(--a1);}
-    .arch-icon{font-size:2rem;margin-bottom:10px;}
-    .arch-label{font-size:.7rem;font-weight:700;color:var(--a1);margin-bottom:4px;}
-    .arch-tool{font-size:.85rem;font-weight:600;margin-bottom:4px;}
-    .arch-desc{font-size:.72rem;color:var(--muted);line-height:1.5;}
-    /* subtitle */
-    .sub-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:56px;}
-    .sub-head{background:linear-gradient(135deg,rgba(124,92,252,.25),rgba(252,92,156,.15));padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
-    .sub-head h3{font-size:1rem;font-weight:600;}
-    .pill{background:rgba(6,214,160,.15);color:var(--green);border:1px solid var(--green);border-radius:99px;font-size:.7rem;font-weight:700;padding:3px 12px;}
-    table{width:100%;border-collapse:collapse;}
-    th{text-align:left;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:12px 20px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);}
-    td{padding:11px 20px;font-size:.875rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;}
-    tr:last-child td{border-bottom:none;}
-    tr:hover td{background:rgba(124,92,252,.06);}
-    .ts{color:var(--a3);font-family:monospace;font-size:.78rem;white-space:nowrap;}
-    .kr{font-weight:600;} .zh{color:var(--muted);font-size:.82rem;} .num{color:var(--a1);font-weight:700;font-size:.78rem;}
-    /* findings */
-    .findings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:56px;}
-    .fc{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--a1);border-radius:14px;padding:20px;transition:transform .2s;}
-    .fc:hover{transform:translateX(4px);} .fc.warn{border-left-color:var(--gold);} .fc.ok{border-left-color:var(--green);}
-    .ft{font-size:.875rem;font-weight:700;margin-bottom:8px;}
-    .fb{font-size:.82rem;color:var(--muted);line-height:1.65;}
-    /* files */
-    .files{display:flex;flex-direction:column;gap:10px;margin-bottom:56px;}
-    .file-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;font-size:.875rem;transition:border-color .2s;}
-    .file-row:hover{border-color:var(--a1);}
-    .fi{font-size:1.3rem;flex-shrink:0;} .fn{font-weight:600;flex:1;} .fd{color:var(--muted);font-size:.8rem;}
-    .badge{font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(6,214,160,.15);color:var(--green);border:1px solid var(--green);white-space:nowrap;}
-    .badge.latest{background:rgba(124,92,252,.15);color:var(--a1);border-color:var(--a1);}
-    /* status */
-    .sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:56px;}
-    .sc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;gap:10px;transition:transform .2s,border-color .2s;}
-    .sc:hover{transform:translateY(-4px);border-color:var(--a1);}
-    .si{font-size:2rem;} .sl{font-size:.75rem;color:var(--muted);} .sv{font-size:1.05rem;font-weight:700;}
-    .ok{color:var(--green);} .warn{color:var(--gold);}
-    footer{text-align:center;padding:40px 24px;color:var(--muted);font-size:.82rem;border-top:1px solid var(--border);}
-    footer strong{color:var(--text);}
+    /* ========== 色票系統：日式暖春 Sakura ========== */
+    :root {
+      --bg:       #FDF6EE;
+      --bg2:      #FAF0E6;
+      --card:     #FFFFFF;
+      --border:   #F0D9CC;
+      --border2:  #E8C4B8;
+      --pink:     #E8829A;
+      --pink-l:   #F7C5D0;
+      --pink-ll:  #FDE8EE;
+      --gold:     #C9874A;
+      --gold-l:   #F5DCC0;
+      --green:    #7A9E7E;
+      --green-l:  #D4E8D6;
+      --red:      #C45C6A;
+      --text:     #3D2410;
+      --text2:    #6B4535;
+      --muted:    #A07860;
+      --shadow:   rgba(200,130,100,.12);
+    }
+
+    /* ========== 基礎重置 ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans TC', 'Outfit', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.7;
+    }
+
+    /* ========== 飄落花瓣動畫 ========== */
+    .petal-container {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .petal {
+      position: absolute; top: -30px;
+      width: 12px; height: 12px;
+      background: var(--pink-l);
+      border-radius: 0 50% 50% 50%;
+      opacity: 0;
+      animation: fall linear infinite;
+    }
+    .petal:nth-child(1)  { left:  5%; animation-duration: 9s;  animation-delay: 0s;   width:10px; height:10px; }
+    .petal:nth-child(2)  { left: 15%; animation-duration: 11s; animation-delay: 2s;   width:14px; height:14px; background:#FBCFD7; }
+    .petal:nth-child(3)  { left: 28%; animation-duration: 8s;  animation-delay: 4s;   }
+    .petal:nth-child(4)  { left: 42%; animation-duration: 13s; animation-delay: 1s;   width:8px;  height:8px;  }
+    .petal:nth-child(5)  { left: 55%; animation-duration: 10s; animation-delay: 6s;   width:16px; height:16px; background:#F9C4CE; }
+    .petal:nth-child(6)  { left: 67%; animation-duration: 12s; animation-delay: 3s;   }
+    .petal:nth-child(7)  { left: 78%; animation-duration: 9s;  animation-delay: 5s;   width:10px; height:10px; }
+    .petal:nth-child(8)  { left: 88%; animation-duration: 14s; animation-delay: 0.5s; width:13px; height:13px; }
+    .petal:nth-child(9)  { left: 35%; animation-duration: 7s;  animation-delay: 7s;   width:9px;  height:9px;  }
+    .petal:nth-child(10) { left: 72%; animation-duration: 11s; animation-delay: 2.5s; background:#FBCFD7; }
+    @keyframes fall {
+      0%   { transform: translateY(0)    rotate(0deg)   translateX(0);   opacity: 0; }
+      10%  { opacity: .7; }
+      80%  { opacity: .5; }
+      100% { transform: translateY(110vh) rotate(420deg) translateX(40px); opacity: 0; }
+    }
+
+    /* ========== 頂部裝飾線 ========== */
+    .top-bar {
+      height: 4px;
+      background: linear-gradient(90deg, var(--pink-l), var(--pink), var(--gold), var(--pink), var(--pink-l));
+    }
+
+    /* ========== HERO ========== */
+    .hero {
+      position: relative;
+      padding: 70px 24px 56px;
+      text-align: center;
+      background: linear-gradient(180deg, #FFF0F5 0%, var(--bg) 100%);
+      z-index: 1;
+    }
+    .hero::after {
+      content: '';
+      display: block;
+      width: 120px; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--pink), transparent);
+      margin: 0 auto;
+    }
+    .hero-eyebrow {
+      font-size: .78rem; letter-spacing: .2em;
+      color: var(--pink); font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: clamp(1.8rem, 5.5vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--pink);
+    }
+    .hero-sub {
+      font-size: 1rem; color: var(--muted);
+      max-width: 520px; margin: 0 auto 32px;
+    }
+    .hero-tags {
+      display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+    }
+    .hero-tag {
+      background: var(--pink-ll); color: var(--red);
+      border: 1px solid var(--pink-l);
+      border-radius: 99px; font-size: .78rem; font-weight: 600;
+      padding: 5px 16px;
+    }
+    .sakura-deco {
+      font-size: 2rem; margin-bottom: 12px; display: block;
+      animation: sway 4s ease-in-out infinite;
+    }
+    @keyframes sway {
+      0%, 100% { transform: rotate(-5deg); }
+      50%       { transform: rotate(5deg); }
+    }
+
+    /* ========== 版面框架 ========== */
+    .container {
+      max-width: 980px; margin: 0 auto; padding: 0 24px 80px;
+      position: relative; z-index: 1;
+    }
+
+    /* ========== 區塊標題 ========== */
+    .section-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px; margin-top: 56px;
+    }
+    .section-header .icon { font-size: 1.5rem; }
+    .section-header h2 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.3rem; font-weight: 700; color: var(--text);
+    }
+    .section-header .line {
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, var(--border2), transparent);
+    }
+    .section-label {
+      font-size: .68rem; letter-spacing: .15em; color: var(--muted);
+      text-transform: uppercase; font-weight: 600;
+      background: var(--gold-l); padding: 2px 10px; border-radius: 99px;
+    }
+
+    /* ========== 卡片基礎 ========== */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 30px;
+      box-shadow: 0 2px 16px var(--shadow);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .card:hover {
+      box-shadow: 0 6px 24px var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    /* ========== 故事區塊 ========== */
+    .story-card {
+      background: linear-gradient(135deg, #FFF8F8, #FFFAF5);
+      border: 1px solid var(--pink-l);
+      border-left: 4px solid var(--pink);
+      border-radius: 18px;
+      padding: 32px 36px;
+      box-shadow: 0 4px 20px rgba(232,130,154,.10);
+    }
+    .story-card p {
+      font-size: 1.0rem; color: var(--text2);
+      line-height: 1.9; margin-bottom: 16px;
+    }
+    .story-card p:last-child { margin-bottom: 0; }
+    .story-card strong { color: var(--red); font-weight: 600; }
+    .story-quote {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.05rem; color: var(--red);
+      border-left: 3px solid var(--pink);
+      padding-left: 16px;
+      margin: 20px 0;
+      font-style: italic;
+    }
+    .author-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--pink-ll); border: 1px solid var(--pink-l);
+      border-radius: 99px; padding: 6px 16px; font-size: .85rem;
+      color: var(--red); font-weight: 600; margin-top: 16px;
+    }
+
+    /* ========== 成果預覽：字幕表格 ========== */
+    .subtitle-showcase {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px var(--shadow);
+    }
+    .showcase-header {
+      background: linear-gradient(135deg, #FFF0F5, #FFF8F0);
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+    .showcase-header h3 { font-size: .95rem; font-weight: 700; color: var(--text); }
+    .badge-ok {
+      background: var(--green-l); color: var(--green);
+      border: 1px solid #B0D8B4; border-radius: 99px;
+      font-size: .7rem; font-weight: 700; padding: 3px 12px;
+    }
+    .sub-table { width: 100%; border-collapse: collapse; }
+    .sub-table th {
+      font-size: .68rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--muted); padding: 10px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(253,246,238,.8);
+      text-align: left;
+    }
+    .sub-table td { padding: 10px 18px; border-bottom: 1px solid rgba(240,217,204,.4); font-size: .88rem; }
+    .sub-table tr:last-child td { border-bottom: none; }
+    .sub-table tr:hover td { background: #FFF8F8; }
+    .td-ts { color: var(--pink); font-family: monospace; font-size: .78rem; white-space: nowrap; }
+    .td-kr { font-weight: 600; color: var(--text); }
+    .td-zh { color: var(--muted); font-size: .83rem; }
+    .td-num { color: var(--gold); font-weight: 700; font-size: .78rem; width: 32px; }
+
+    /* 展開更多字幕 */
+    .more-rows { display: none; }
+    .toggle-btn {
+      display: block; width: 100%; padding: 12px;
+      background: var(--bg2); border: none; border-top: 1px solid var(--border);
+      color: var(--pink); font-size: .85rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+      font-family: inherit;
+    }
+    .toggle-btn:hover { background: var(--pink-ll); }
+
+    /* ========== 工具三欄卡 ========== */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .tool-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 26px 24px;
+      box-shadow: 0 2px 12px var(--shadow);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .tool-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px var(--shadow); }
+    .tool-card.agt  { border-top: 4px solid var(--pink); }
+    .tool-card.pot  { border-top: 4px solid var(--gold); }
+    .tool-card.nopot{ border-top: 4px solid var(--green); }
+    .tool-icon { font-size: 2.4rem; margin-bottom: 12px; }
+    .tool-name { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .tool-role { font-size: .75rem; color: var(--muted); letter-spacing: .08em; margin-bottom: 14px; font-weight: 600; text-transform: uppercase; }
+    .tool-items { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .tool-items li {
+      font-size: .88rem; color: var(--text2);
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+    .tool-items li::before { content: '🌸'; font-size: .75rem; margin-top: 2px; flex-shrink: 0; }
+    .tool-card.pot  .tool-items li::before { content: '▶️'; }
+    .tool-card.nopot .tool-items li::before { content: '✅'; }
+    .tool-note {
+      margin-top: 14px; padding: 10px 14px;
+      background: var(--bg2); border-radius: 10px;
+      font-size: .8rem; color: var(--muted); line-height: 1.6;
+    }
+
+    /* ========== 流程路線圖 ========== */
+    .route-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .route-card {
+      border-radius: 18px; padding: 24px 26px;
+      border: 2px solid transparent;
+      box-shadow: 0 2px 16px var(--shadow);
+    }
+    .route-card.make {
+      background: linear-gradient(135deg, #FFF8FA, #FFF4F0);
+      border-color: var(--pink-l);
+    }
+    .route-card.use {
+      background: linear-gradient(135deg, #F8FFF8, #FFF8F0);
+      border-color: #C8E6C9;
+    }
+    .route-label {
+      font-size: .7rem; letter-spacing: .15em; text-transform: uppercase;
+      font-weight: 700; margin-bottom: 10px;
+    }
+    .route-card.make .route-label { color: var(--pink); }
+    .route-card.use  .route-label { color: var(--green); }
+    .route-title {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 16px;
+    }
+    .route-steps { display: flex; flex-direction: column; gap: 10px; }
+    .route-step {
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .step-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      font-size: .72rem; font-weight: 700; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .route-card.make .step-num { background: var(--pink-l); color: var(--red); }
+    .route-card.use  .step-num { background: var(--green-l); color: var(--green); }
+    .step-text { font-size: .88rem; color: var(--text2); line-height: 1.6; }
+    .step-sub { font-size: .75rem; color: var(--muted); }
+
+    /* ========== 人生啟示 ========== */
+    .insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .insight-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      box-shadow: 0 2px 12px var(--shadow);
+      transition: transform .2s;
+    }
+    .insight-card:hover { transform: translateY(-3px); }
+    .insight-num {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 2rem; font-weight: 700;
+      color: var(--pink-l); line-height: 1;
+      margin-bottom: 8px;
+    }
+    .insight-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .insight-body { font-size: .88rem; color: var(--muted); line-height: 1.75; }
+
+    /* ========== 下載區 ========== */
+    .download-box {
+      background: linear-gradient(135deg, #FFF8FA, #FFF8F0);
+      border: 2px solid var(--pink-l);
+      border-radius: 20px;
+      padding: 36px 32px;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(232,130,154,.12);
+    }
+    .download-box h3 {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px;
+    }
+    .download-box p { font-size: .9rem; color: var(--muted); margin-bottom: 24px; }
+    .dl-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .dl-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 99px;
+      font-size: .9rem; font-weight: 700;
+      text-decoration: none; transition: all .2s;
+      font-family: inherit;
+      border: none; cursor: pointer;
+    }
+    .dl-btn.primary {
+      background: linear-gradient(135deg, var(--pink), var(--red));
+      color: #fff; box-shadow: 0 4px 14px rgba(232,130,154,.4);
+    }
+    .dl-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(232,130,154,.5); }
+    .dl-btn.secondary {
+      background: var(--card); color: var(--text2);
+      border: 1px solid var(--border2);
+    }
+    .dl-btn.secondary:hover { background: var(--pink-ll); border-color: var(--pink-l); }
+
+    /* ========== 技術深潛手風琴 ========== */
+    .tech-section {
+      background: #F9F4EE;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .tech-toggle {
+      width: 100%; padding: 20px 28px;
+      background: none; border: none;
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: inherit; font-size: 1rem; font-weight: 700;
+      color: var(--text); cursor: pointer;
+      transition: background .2s;
+    }
+    .tech-toggle:hover { background: var(--gold-l); }
+    .tech-toggle .arrow {
+      font-size: .85rem; color: var(--muted);
+      transition: transform .3s;
+    }
+    .tech-toggle.open .arrow { transform: rotate(180deg); }
+    .tech-body { display: none; padding: 0 28px 28px; }
+    .tech-body.open { display: block; }
+
+    /* 技術流程步驟 */
+    .arch-flow { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+    .arch-step {
+      flex: 1; min-width: 130px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px 12px; text-align: center;
+      transition: transform .2s, border-color .2s;
+    }
+    .arch-step:hover { transform: translateY(-3px); border-color: var(--pink); }
+    .arch-step .a-icon { font-size: 1.6rem; margin-bottom: 8px; }
+    .arch-step .a-num { font-size: .65rem; color: var(--pink); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2px; }
+    .arch-step .a-tool { font-size: .8rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .arch-step .a-desc { font-size: .72rem; color: var(--muted); line-height: 1.5; }
+
+    /* 技術時間軸 */
+    .tl { position: relative; padding-left: 28px; }
+    .tl::before {
+      content: ''; position: absolute; left: 8px; top: 0; bottom: 0;
+      width: 2px; background: linear-gradient(to bottom, var(--pink-l), transparent);
+    }
+    .tl-item { position: relative; margin-bottom: 20px; }
+    .tl-dot {
+      position: absolute; left: -24px; top: 6px;
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 2px solid var(--pink); background: var(--bg);
+      transition: background .2s;
+    }
+    .tl-item:hover .tl-dot { background: var(--pink); }
+    .tl-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 18px;
+      transition: border-color .2s, transform .2s;
+    }
+    .tl-card:hover { border-color: var(--pink); transform: translateX(4px); }
+    .tl-ver { font-size: .68rem; color: var(--pink); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2px; }
+    .tl-title { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .tl-desc { font-size: .82rem; color: var(--muted); line-height: 1.65; }
+    .tl-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .tag {
+      font-size: .65rem; font-weight: 600; padding: 2px 9px;
+      border-radius: 99px; border: 1px solid;
+    }
+    .tag-p { color: var(--pink); border-color: var(--pink-l); }
+    .tag-w { color: var(--red);  border-color: #FFCDD2; }
+    .tag-g { color: var(--gold); border-color: var(--gold-l); }
+    .tag-n { color: var(--green); border-color: #C8E6C9; }
+
+    /* 技術發現 */
+    .findings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 20px; }
+    .fc {
+      background: var(--card); border: 1px solid var(--border);
+      border-left: 3px solid var(--muted);
+      border-radius: 12px; padding: 16px 18px; transition: transform .2s;
+    }
+    .fc:hover { transform: translateX(3px); }
+    .fc.ok   { border-left-color: var(--green); }
+    .fc.warn { border-left-color: var(--gold); }
+    .fc.bad  { border-left-color: var(--red); }
+    .ft { font-size: .85rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .fb { font-size: .8rem; color: var(--muted); line-height: 1.65; }
+
+    /* ========== 頁尾 ========== */
+    footer {
+      text-align: center; padding: 40px 24px 32px;
+      color: var(--muted); font-size: .82rem;
+      border-top: 1px solid var(--border);
+      background: var(--bg2);
+      position: relative; z-index: 1;
+    }
+    footer .sakura-foot { font-size: 1.2rem; margin-bottom: 8px; }
+    footer a { color: var(--pink); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ========== 響應式 ========== */
+    @media (max-width: 600px) {
+      .story-card { padding: 22px 20px; }
+      .section-header { margin-top: 40px; }
+      .tools-grid, .route-grid, .insights-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
+
+<!-- 花瓣動畫 -->
+<div class="petal-container" aria-hidden="true">
+  <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+  <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+  <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+  <div class="petal"></div>
+</div>
+
+<div class="top-bar"></div>
+
+<!-- ═══════════════ HERO ═══════════════ -->
 <section class="hero">
-  <div class="hero-badge">🎵 AGY 雙語字幕工廠 — 工程總結報告</div>
-  <h1>LE SSERAFIM<br/>「HOT」雙語字幕</h1>
-  <p class="hero-sub">從 Whisper AI 聽寫、Demucs 人聲分離、stable-ts 強制對齊，到 v7.1 的「前段保留 × 後段分段重對齊」混合產線——一場跨越七個版本、消除後半段 6 秒累積漂移的聲學工程史詩。</p>
-  <div class="hero-meta">
-    <div class="meta-item"><div class="val">v7.1</div><div class="lbl">最終版本</div></div>
-    <div class="meta-item"><div class="val">43行</div><div class="lbl">雙語字幕條目</div></div>
-    <div class="meta-item"><div class="val">9秒</div><div class="lbl">最早起跑時間點</div></div>
-    <div class="meta-item"><div class="val">6秒→0</div><div class="lbl">後段漂移修正</div></div>
+  <span class="sakura-deco">🌸</span>
+  <p class="hero-eyebrow">NEO 的字幕計畫</p>
+  <h1>我只是想聽懂<br/><em>LE SSERAFIM 在唱什麼</em></h1>
+  <p class="hero-sub">一個 K-pop 粉絲，為了讀懂最愛偶像的歌詞，一步步用 AI 工具做出雙語字幕的真實故事。不需要程式背景，也能看懂這段旅程。</p>
+  <div class="hero-tags">
+    <span class="hero-tag">🎵 LE SSERAFIM「HOT」</span>
+    <span class="hero-tag">🌸 Sakura 個人直拍</span>
+    <span class="hero-tag">🇰🇷 韓中雙語字幕</span>
+    <span class="hero-tag">🤖 AI 輔助製作</span>
   </div>
 </section>
 
 <div class="container">
-  <div class="section-title"><span>🏗️</span> v6.2 終極產線架構</div>
-  <div class="arch-flow">
-    <div class="arch-step"><div class="arch-icon">📺</div><div class="arch-label">Step 1</div><div class="arch-tool">yt-dlp</div><div class="arch-desc">下載直拍 MP3<br/>純淨 YouTube URL</div></div>
-    <div class="arch-step"><div class="arch-icon">✂️</div><div class="arch-label">Step 2</div><div class="arch-tool">Demucs htdemucs</div><div class="arch-desc">AI 音軌分離<br/>提煉純人聲 vocals.wav</div></div>
-    <div class="arch-step"><div class="arch-icon">📝</div><div class="arch-label">Step 3</div><div class="arch-tool">yt-dlp CC</div><div class="arch-desc">擷取官方 MV<br/>韓文 CC 字幕歌詞</div></div>
-    <div class="arch-step"><div class="arch-icon">📌</div><div class="arch-label">Step 4</div><div class="arch-tool">stable-ts align</div><div class="arch-desc">強制對齊：官方歌詞<br/>× 直拍音訊時間軸</div></div>
-    <div class="arch-step"><div class="arch-icon">🌏</div><div class="arch-label">Step 5</div><div class="arch-tool">AGY 大腦翻譯</div><div class="arch-desc">逐行繁體中文<br/>詩意雙語合體</div></div>
+
+  <!-- ═══════════════ 故事 ═══════════════ -->
+  <div class="section-header">
+    <span class="icon">📖</span>
+    <h2>這一切是怎麼開始的</h2>
+    <div class="line"></div>
   </div>
 
-  <div class="section-title"><span>📈</span> 六代版本演進時間軸</div>
-  <div class="timeline">
-    <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-version">v1.0 — 基礎款</div><div class="tl-title">Whisper base + 原始音軌</div><div class="tl-desc">首次嘗試，字幕從 28 秒才起跑，前段演唱歌詞全數流失。</div><div class="tl-tags"><span class="tag tag-p">Whisper base</span><span class="tag tag-k">時間軸偏移嚴重</span></div></div></div>
-    <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-version">v2.0 / v3.0 — 模型升級</div><div class="tl-title">Whisper small → medium + beam_size=5</div><div class="tl-desc">升級至 medium 後品質大幅提升，搭配 beam_size=5 與 initial_prompt 導引，但起始時間軸仍受舞台雜音影響。</div><div class="tl-tags"><span class="tag tag-p">Whisper medium</span><span class="tag tag-c">beam_size=5</span><span class="tag tag-g">initial_prompt 工程</span></div></div></div>
-    <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-version">v4.0 — 音軌分離突破</div><div class="tl-title">Demucs htdemucs 人聲提煉</div><div class="tl-desc">引入 Meta AI 的 Demucs，強制剝除粉絲尖叫聲與舞台貝斯，驗證半開麥 CD 合成軌的聲學真理。</div><div class="tl-tags"><span class="tag tag-p">Demucs 4.0.1</span><span class="tag tag-c">htdemucs two-stems</span><span class="tag tag-k">聲學分離驗證</span></div></div></div>
-    <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-version">v5.0 — 官方 CC 突破</div><div class="tl-title">yt-dlp 直取官方韓文 CC 字幕</div><div class="tl-desc">發現官方 MV 附帶 CC 字幕，以 yt-dlp 秒速直取，歌詞正確率達 100%。但 MV 與直拍的時間軸不同步。</div><div class="tl-tags"><span class="tag tag-n">官方 CC 歌詞 100% 正確</span><span class="tag tag-k">MV vs 直拍不同步</span></div></div></div>
-    <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-version">v6.2 — 強制對齊封頂 🏆</div><div class="tl-title">stable-ts Forced Alignment × 逐字時間軸重建</div><div class="tl-desc">最終解法：以官方 CC 歌詞為正確文字，以 Demucs 純人聲為時間軸素材，透過 stable-ts 強制對齊取得逐字時間戳，再依原始結構重建輸出。實現 9 秒起頭、43 行完整雙語字幕。</div><div class="tl-tags"><span class="tag tag-g">stable-ts 2.19.1</span><span class="tag tag-n">9 秒起頭</span><span class="tag tag-c">43 行逐行對齊</span><span class="tag tag-p">歌詞 × 時間軸雙重精準</span></div></div></div>
-    <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-version">v7.0 — 漂移現形</div><div class="tl-title">使用者實聽校正：後半段 6 秒累積漂移</div><div class="tl-desc">使用者回報「I'm burning HOT」實際人聲在 1:06，v6.2 字幕卻到 1:12 才出現——揭露「整首一次對齊」會在後半段累積約 6 秒漂移。嘗試 Whisper clip_timestamps / initial_prompt 重聽後段，但 Whisper 對舞台音樂產生幻覺、亂猜歌詞，宣告失敗。</div><div class="tl-tags"><span class="tag tag-k">後段 6 秒漂移</span><span class="tag tag-k">Whisper 幻覺</span><span class="tag tag-g">clip_timestamps 無效</span></div></div></div>
-    <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-version">v7.1 — 分段對齊封頂 🏆</div><div class="tl-title">前段保留 × 後段獨立強制對齊（混合產線）</div><div class="tl-desc">最終解法：前 20 行（0:09~1:03）沿用 v6.2 準確結果；第 21 行起以 ffmpeg -ss 60 截切後段音訊，單獨用 stable-ts 強制對齊後段官方歌詞，加回 60 秒偏移後於 1:03 縫合。兩段各自在自己音域內對齊，消除整首累積漂移，「I'm burning HOT」由 1:12 修正回 1:03。此版翻譯改由 Claude Sonnet 4.6 (Thinking) 完成。</div><div class="tl-tags"><span class="tag tag-c">ffmpeg 截切</span><span class="tag tag-n">分段強制對齊</span><span class="tag tag-n">6 秒漂移歸零</span><span class="tag tag-p">Claude Sonnet 4.6</span></div></div></div>
+  <div class="story-card">
+    <p>
+      我叫 NEO，是個 LE SSERAFIM 的粉絲。有一天我在 YouTube 上反覆看 Sakura 的個人直拍影片——她唱的那段「I'm burning HOT」，配上現場的燈光和粉絲的呼聲，整個人起雞皮疙瘩。
+    </p>
+    <div class="story-quote">
+      「她到底在唱什麼？那些韓文歌詞是什麼意思？」
+    </div>
+    <p>
+      YouTube 的自動翻譯字幕看了比沒看還糟，翻出來的中文根本是亂碼。我想：<strong>如果有一個能對上影片時間點的韓中雙語字幕，該有多好？</strong>
+    </p>
+    <p>
+      於是我開始研究，發現可以用 AI 工具來做這件事。過程不是一帆風順的——字幕對不上、AI 亂猜歌詞、時間跑掉……但我一次次修正，最後真的做出來了。這個網頁，就是記錄那段折騰又有趣的旅程。
+    </p>
+    <div class="author-badge">
+      🌸 作者：NEO（hinet）  ·  GitHub：NEOreload2025
+    </div>
   </div>
 
-  <div class="section-title"><span>🎬</span> 最終雙語字幕預覽（前 20 行）</div>
-  <div class="sub-panel">
-    <div class="sub-head"><h3>LE SSERAFIM「HOT」— 直拍個人版雙語字幕 v6.2 FINAL</h3><span class="pill">✅ 官方歌詞 × 直拍時間軸</span></div>
-    <table>
-      <thead><tr><th>#</th><th>時間軸</th><th>韓文原文</th><th>繁體中文</th></tr></thead>
+  <!-- ═══════════════ 成果展示 ═══════════════ -->
+  <div class="section-header">
+    <span class="icon">🎬</span>
+    <h2>做出來的字幕長這樣</h2>
+    <div class="line"></div>
+    <span class="section-label">最終版本 v7.1</span>
+  </div>
+
+  <div class="subtitle-showcase">
+    <div class="showcase-header">
+      <h3>LE SSERAFIM「HOT」Sakura 直拍 — 韓中雙語字幕</h3>
+      <span class="badge-ok">✅ 43 行完整對齊</span>
+    </div>
+    <table class="sub-table">
+      <thead>
+        <tr>
+          <th>#</th><th>時間點</th><th>韓文原文</th><th>繁體中文翻譯</th>
+        </tr>
+      </thead>
       <tbody>
-        <tr><td class="num">1</td><td class="ts">00:09 → 00:11</td><td class="kr">위태로운 드라이브</td><td class="zh">在這危險搖晃的旅途中</td></tr>
-        <tr><td class="num">2</td><td class="ts">00:11 → 00:13</td><td class="kr">바꿔 넣어 gear</td><td class="zh">全速切換齒輪</td></tr>
-        <tr><td class="num">3</td><td class="ts">00:13 → 00:14</td><td class="kr">불타는 노을</td><td class="zh">那如火燃燒的晚霞</td></tr>
-        <tr><td class="num">4</td><td class="ts">00:14 → 00:17</td><td class="kr">너와 내 tears so</td><td class="zh">你與我的淚水，所以...</td></tr>
-        <tr><td class="num">5</td><td class="ts">00:17 → 00:21</td><td class="kr">Don't be afraid 의심 없지</td><td class="zh">別害怕，無需有任何懷疑</td></tr>
-        <tr><td class="num">6</td><td class="ts">00:21 → 00:23</td><td class="kr">손을 잡아 cause tonight</td><td class="zh">牽起我的手，因為今晚</td></tr>
-        <tr><td class="num">7</td><td class="ts">00:23 → 00:26</td><td class="kr">우린 burn to shine yeah</td><td class="zh">我們將為閃耀而燃燒 yeah</td></tr>
-        <tr><td class="num">8</td><td class="ts">00:26 → 00:28</td><td class="kr">꽉 안아줘 my dear</td><td class="zh">緊緊擁抱我 my dear</td></tr>
-        <tr><td class="num">9</td><td class="ts">00:28 → 00:30</td><td class="kr">우리가 나눠 가진</td><td class="zh">我們共同分擔著</td></tr>
-        <tr><td class="num">10</td><td class="ts">00:30 → 00:33</td><td class="kr">가슴안의 흉터 자리에</td><td class="zh">深深刻在胸口的這滿身傷痕</td></tr>
-        <tr><td class="num">11</td><td class="ts">00:33 → 00:34</td><td class="kr">붉게 물든 엔진</td><td class="zh">那被渲染得一片血紅的引擎</td></tr>
-        <tr><td class="num">12</td><td class="ts">00:34 → 00:37</td><td class="kr">네 눈 속의 날</td><td class="zh">在你眼底深處浮現的我</td></tr>
-        <tr><td class="num">13</td><td class="ts">00:37 → 00:39</td><td class="kr">영원히 기억해 준다면</td><td class="zh">只要你願意永遠銘記於心</td></tr>
-        <tr><td class="num">14</td><td class="ts">00:39 → 00:42</td><td class="kr">I'm burning HOT</td><td class="zh">我正熾熱燃燒</td></tr>
-        <tr><td class="num">15</td><td class="ts">00:42 → 00:46</td><td class="kr">내가 나로 살 수 있다면</td><td class="zh">只要我能真實做我自己</td></tr>
-        <tr><td class="num">16</td><td class="ts">00:46 → 00:49</td><td class="kr">재가 된대도 난 좋아</td><td class="zh">就算化為灰燼我也甘之如飴</td></tr>
-        <tr><td class="num">17</td><td class="ts">00:49 → 00:53</td><td class="kr">So tonight 안겨 네 품 안에</td><td class="zh">所以今晚，深深投入你懷中</td></tr>
-        <tr><td class="num">18</td><td class="ts">00:53 → 00:56</td><td class="kr">Bonnie and Clyde it oh</td><td class="zh">如同 Bonnie and Clyde 般奔命 oh</td></tr>
-        <tr><td class="num">19</td><td class="ts">00:56 → 01:01</td><td class="kr">Not running from it</td><td class="zh">不曾逃避，不曾退縮</td></tr>
-        <tr><td class="num">20</td><td class="ts">01:01 → 01:03</td><td class="kr">불타오르지 l love it</td><td class="zh">狂熱燃燒，我深愛著這一切</td></tr>
+        <tr><td class="td-num">1</td><td class="td-ts">00:09</td><td class="td-kr">위태로운 드라이브</td><td class="td-zh">在這危險搖晃的旅途中</td></tr>
+        <tr><td class="td-num">2</td><td class="td-ts">00:11</td><td class="td-kr">바꿔 넣어 gear</td><td class="td-zh">全速切換齒輪</td></tr>
+        <tr><td class="td-num">3</td><td class="td-ts">00:13</td><td class="td-kr">불타는 노을</td><td class="td-zh">那如火燃燒的晚霞</td></tr>
+        <tr><td class="td-num">4</td><td class="td-ts">00:14</td><td class="td-kr">너와 내 tears so</td><td class="td-zh">你與我的淚水，所以...</td></tr>
+        <tr><td class="td-num">5</td><td class="td-ts">00:17</td><td class="td-kr">Don't be afraid 의심 없지</td><td class="td-zh">別害怕，無需有任何懷疑</td></tr>
+        <tr><td class="td-num">6</td><td class="td-ts">00:21</td><td class="td-kr">손을 잡아 cause tonight</td><td class="td-zh">牽起我的手，因為今晚</td></tr>
+        <tr><td class="td-num">7</td><td class="td-ts">00:23</td><td class="td-kr">우린 burn to shine yeah</td><td class="td-zh">我們將為閃耀而燃燒</td></tr>
+        <tr><td class="td-num">8</td><td class="td-ts">00:26</td><td class="td-kr">꽉 안아줘 my dear</td><td class="td-zh">緊緊擁抱我 my dear</td></tr>
+        <tr><td class="td-num">9</td><td class="td-ts">00:28</td><td class="td-kr">우리가 나눠 가진</td><td class="td-zh">我們共同分擔著</td></tr>
+        <tr><td class="td-num">10</td><td class="td-ts">00:30</td><td class="td-kr">가슴안의 흉터 자리에</td><td class="td-zh">深深刻在胸口的滿身傷痕</td></tr>
+        <tr class="more-rows"><td class="td-num">11</td><td class="td-ts">00:33</td><td class="td-kr">붉게 물든 엔진</td><td class="td-zh">那被渲染得一片血紅的引擎</td></tr>
+        <tr class="more-rows"><td class="td-num">12</td><td class="td-ts">00:34</td><td class="td-kr">네 눈 속의 날</td><td class="td-zh">在你眼底深處浮現的我</td></tr>
+        <tr class="more-rows"><td class="td-num">13</td><td class="td-ts">00:37</td><td class="td-kr">영원히 기억해 준다면</td><td class="td-zh">只要你願意永遠銘記於心</td></tr>
+        <tr class="more-rows"><td class="td-num">14</td><td class="td-ts">00:39</td><td class="td-kr">I'm burning HOT</td><td class="td-zh">我正熾熱燃燒</td></tr>
+        <tr class="more-rows"><td class="td-num">15</td><td class="td-ts">00:42</td><td class="td-kr">내가 나로 살 수 있다면</td><td class="td-zh">只要我能真實做我自己</td></tr>
+        <tr class="more-rows"><td class="td-num">16</td><td class="td-ts">00:46</td><td class="td-kr">재가 된대도 난 좋아</td><td class="td-zh">就算化為灰燼我也甘之如飴</td></tr>
+        <tr class="more-rows"><td class="td-num">17</td><td class="td-ts">00:49</td><td class="td-kr">So tonight 안겨 네 품 안에</td><td class="td-zh">所以今晚，深深投入你懷中</td></tr>
+        <tr class="more-rows"><td class="td-num">18</td><td class="td-ts">00:53</td><td class="td-kr">Bonnie and Clyde it oh</td><td class="td-zh">如同 Bonnie and Clyde 般奔命</td></tr>
+        <tr class="more-rows"><td class="td-num">19</td><td class="td-ts">00:56</td><td class="td-kr">Not running from it</td><td class="td-zh">不曾逃避，不曾退縮</td></tr>
+        <tr class="more-rows"><td class="td-num">20</td><td class="td-ts">01:01</td><td class="td-kr">불타오르지 l love it</td><td class="td-zh">狂熱燃燒，我深愛著這一切</td></tr>
+        <tr class="more-rows"><td class="td-num">21</td><td class="td-ts">01:03</td><td class="td-kr">I'm burning HOT</td><td class="td-zh">我正熾熱燃燒</td></tr>
+        <tr class="more-rows"><td class="td-num">22</td><td class="td-ts">01:10</td><td class="td-kr">마치</td><td class="td-zh">宛如...</td></tr>
+        <tr class="more-rows"><td class="td-num">23</td><td class="td-ts">01:11</td><td class="td-kr">영원함 속 날아오를 불사조같이</td><td class="td-zh">宛如在永恆中展翅高飛的不死鳥</td></tr>
+        <tr class="more-rows"><td class="td-num">42</td><td class="td-ts">02:05</td><td class="td-kr">살게 해 날</td><td class="td-zh">讓我放肆活著</td></tr>
+        <tr class="more-rows"><td class="td-num">43</td><td class="td-ts">02:05</td><td class="td-kr">I'm burning HOT 🎵</td><td class="td-zh">我正盡情熾熱盛放</td></tr>
       </tbody>
     </table>
+    <button class="toggle-btn" id="toggleBtn" onclick="toggleRows()">
+      🌸 展開查看完整 43 行字幕 ▾
+    </button>
   </div>
 
-  <div class="section-title"><span>💡</span> 關鍵工程發現</div>
-  <div class="findings-grid">
-    <div class="fc"><div class="ft">🎤 半開麥 Live AR 的聲學真理</div><div class="fb">K-POP 現場開場通常採用「半開麥 CD 合成軌」，前段人聲被壓進伴奏頻段。即使使用 Demucs 完整分離，前段依然是純伴奏，這是混音工程的物理事實，而非 AI 能力不足。</div></div>
-    <div class="fc ok"><div class="ft">✅ 強制對齊是最終解法</div><div class="fb">Demucs vocals + 官方 CC 歌詞 → stable-ts.align() 是本工程的終極答案。歌詞準確性由官方保障，時間軸精準度由直拍音訊保障，兩者互不干涉。</div></div>
-    <div class="fc warn"><div class="ft">⚠️ YouTube URL 純淨性守則</div><div class="fb">含有 &amp;list= 參數的 URL 會讓 AI 擷取到播放清單中其他影片的資訊。務必使用「分享按鈕」產生的純淨 youtu.be/ID 短網址。</div></div>
-    <div class="fc"><div class="ft">🔍 MV vs 直拍的時間軸差異</div><div class="fb">官方 MV 的 CC 字幕時間軸與現場直拍版本存在結構性差異，無法直接套用。強制對齊是跨越這道鴻溝的唯一橋樑。</div></div>
-    <div class="fc"><div class="ft">🧠 Whisper 模型規格建議</div><div class="fb">base/small 適合乾淨語音；medium 是 K-POP 現場舞台的甜蜜點（需 ~5GB VRAM）；large-v3 可作未來升級選項。</div></div>
-    <div class="fc ok"><div class="ft">🎯 逐字時間戳重建技術</div><div class="fb">stable-ts 逐字時間戳結合原始分行字數映射，可精準重建「以 MV CC 分行為邊界、以直拍逐字為時間點」的完美雙語字幕。</div></div>
-    <div class="fc ok"><div class="ft">🧩 分段對齊消除累積漂移</div><div class="fb">「整首一次強制對齊」的誤差會隨時間累積，後半段可漂移達 6 秒。把歌曲切成前後兩段、各自獨立對齊再於 1:03 縫合，能把累積誤差歸零——這是 v7.1 的核心突破。</div></div>
+  <!-- ═══════════════ 工具分工 ═══════════════ -->
+  <div class="section-header">
+    <span class="icon">🧰</span>
+    <h2>做這件事需要哪些工具？</h2>
+    <div class="line"></div>
   </div>
 
-  <div class="section-title"><span>📁</span> 專案產出檔案清單</div>
-  <div class="files">
-    <div class="file-row"><div class="fi">🏆</div><div><div class="fn">LE_SSERAFIM_HOT_Bilingual_FINAL_v71.srt</div><div class="fd">最新終極版 — 前段保留＋後段重對齊，後半 6 秒漂移修正（Sonnet 4.6）</div></div><span class="badge latest">最新版本</span></div>
-    <div class="file-row"><div class="fi">🎬</div><div><div class="fn">LE_SSERAFIM_HOT_Bilingual_FINAL_v62.srt</div><div class="fd">v6.2 雙語字幕 — 9秒起頭、43行（後半有 6 秒漂移，已由 v7.1 取代）</div></div><span class="badge">前一版</span></div>
-    <div class="file-row"><div class="fi">🎵</div><div><div class="fn">LE_SSERAFIM_HOT_Forced_Aligned_v62_KR.srt</div><div class="fd">強制對齊韓文原文字幕（43行）</div></div><span class="badge">對齊基底</span></div>
-    <div class="file-row"><div class="fi">📋</div><div><div class="fn">LE_SSERAFIM_HOT_Official_CC_KR.ko.srt</div><div class="fd">官方 MV 韓文 CC 字幕（歌詞來源）</div></div><span class="badge">官方來源</span></div>
-    <div class="file-row"><div class="fi">🎤</div><div><div class="fn">separated/htdemucs/LE_SSERAFIM_HOT/vocals.wav</div><div class="fd">Demucs 分離純人聲音軌（時間軸來源）</div></div><span class="badge">音訊素材</span></div>
-    <div class="file-row"><div class="fi">🐍</div><div><div class="fn">forced_align_v6.py</div><div class="fd">v6.2 強制對齊主腳本</div></div><span class="badge latest">核心產線</span></div>
-    <div class="file-row"><div class="fi">🐍</div><div><div class="fn">transcribe_to_srt_v4.py</div><div class="fd">v4.0 Demucs + Whisper medium 純人聲聽寫腳本</div></div><span class="badge">輔助工具</span></div>
-    <div class="file-row"><div class="fi">📖</div><div><div class="fn">AGY_Bilingual_Subtitle_Workflow_Log.md</div><div class="fd">工作流程 SOP 與 URL 純淨守則文件</div></div><span class="badge">SOP 文件</span></div>
+  <div class="tools-grid">
+    <!-- AGY -->
+    <div class="tool-card agt">
+      <div class="tool-icon">🤖</div>
+      <div class="tool-name">AGY（Antigravity AI）</div>
+      <div class="tool-role">幕後大腦 · 你看不見畫面的部分</div>
+      <ul class="tool-items">
+        <li>下載 YouTube 影片的聲音檔</li>
+        <li>用 AI 把人聲從背景音樂裡分離出來</li>
+        <li>分析音頻，找出每個字唱在哪一秒</li>
+        <li>把韓文歌詞翻譯成流暢的繁體中文</li>
+        <li>輸出一個標準的 .srt 字幕檔案</li>
+      </ul>
+      <div class="tool-note">
+        ⏱ 整個過程大約需要 <strong>10～30 分鐘</strong>，可以去做別的事等它跑完。
+      </div>
+    </div>
+
+    <!-- PotPlayer -->
+    <div class="tool-card pot">
+      <div class="tool-icon">🎬</div>
+      <div class="tool-name">PotPlayer</div>
+      <div class="tool-role">幕前舞台 · 你直接享受的播放器</div>
+      <ul class="tool-items">
+        <li>在電腦上播放 YouTube 影片串流</li>
+        <li>把 .srt 字幕拖進去，立刻套用</li>
+        <li>可以自己調字幕大小、顏色、位置</li>
+        <li>支援雙語字幕同時顯示</li>
+        <li>免費下載，Windows 專用</li>
+      </ul>
+      <div class="tool-note">
+        💡 安裝後把字幕檔拖進播放視窗即可，<strong>不需要任何設定</strong>。
+      </div>
+    </div>
+
+    <!-- 沒有 PotPlayer -->
+    <div class="tool-card nopot">
+      <div class="tool-icon">📱</div>
+      <div class="tool-name">沒有 PotPlayer 怎麼辦？</div>
+      <div class="tool-role">替代方案 · 都能用</div>
+      <ul class="tool-items">
+        <li><strong>VLC 播放器</strong>：免費、Windows / Mac / Linux 都支援</li>
+        <li><strong>MX Player</strong>：Android 手機用戶的首選</li>
+        <li><strong>IINA</strong>：Mac 用戶推薦，介面超漂亮</li>
+        <li>以上都支援拖曳 .srt 字幕，效果幾乎一樣</li>
+      </ul>
+      <div class="tool-note">
+        ⚠️ 如果只用 <strong>YouTube 網頁</strong>，無法套用自製字幕，只能靠 YouTube 內建的機器翻譯——品質差很多。
+      </div>
+    </div>
   </div>
 
-  <div class="section-title"><span>⚙️</span> 技術棧狀態</div>
-  <div class="sg">
-    <div class="sc"><div class="si">🎬</div><div class="sl">影音下載</div><div class="sv ok">yt-dlp ✅</div></div>
-    <div class="sc"><div class="si">✂️</div><div class="sl">音軌分離</div><div class="sv ok">Demucs 4.0.1 ✅</div></div>
-    <div class="sc"><div class="si">🧠</div><div class="sl">語音識別</div><div class="sv ok">Whisper medium ✅</div></div>
-    <div class="sc"><div class="si">📌</div><div class="sl">強制對齊</div><div class="sv ok">stable-ts 2.19.1 ✅</div></div>
-    <div class="sc"><div class="si">🌏</div><div class="sl">翻譯引擎</div><div class="sv ok">Gemini Pro → Sonnet 4.6 ✅</div></div>
-    <div class="sc"><div class="si">🔮</div><div class="sl">未來升級</div><div class="sv warn">Whisper large-v3</div></div>
+  <!-- ═══════════════ 流程地圖 ═══════════════ -->
+  <div class="section-header">
+    <span class="icon">🗺️</span>
+    <h2>你可以怎麼做？</h2>
+    <div class="line"></div>
   </div>
-</div>
 
+  <div class="route-grid">
+    <!-- 路線 A：自己做 -->
+    <div class="route-card make">
+      <div class="route-label">路線 A</div>
+      <div class="route-title">🌸 自己動手做字幕</div>
+      <div class="route-steps">
+        <div class="route-step">
+          <div class="step-num">1</div>
+          <div class="step-text">找到你喜歡的演唱會直拍影片，複製乾淨的連結<div class="step-sub">從影片底下的「分享」按鈕取得，不要複製網址列的長網址</div></div>
+        </div>
+        <div class="route-step">
+          <div class="step-num">2</div>
+          <div class="step-text">打開 AGY，用一句話告訴它你要做什麼<div class="step-sub">例如：「幫我下載這個影片的音訊並做雙語字幕」</div></div>
+        </div>
+        <div class="route-step">
+          <div class="step-num">3</div>
+          <div class="step-text">等 AI 跑完（10～30 分鐘）<div class="step-sub">這段時間可以去喝個咖啡 ☕</div></div>
+        </div>
+        <div class="route-step">
+          <div class="step-num">4</div>
+          <div class="step-text">收到 .srt 字幕檔，拖進 PotPlayer 享受<div class="step-sub">配上直拍影片，完美雙語字幕！</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 路線 B：直接用 -->
+    <div class="route-card use">
+      <div class="route-label">路線 B</div>
+      <div class="route-title">✅ 直接用現成字幕</div>
+      <div class="route-steps">
+        <div class="route-step">
+          <div class="step-num">1</div>
+          <div class="step-text">從下方按鈕下載 NEO 已做好的字幕檔<div class="step-sub">免等待，直接可用</div></div>
+        </div>
+        <div class="route-step">
+          <div class="step-num">2</div>
+          <div class="step-text">在 PotPlayer（或 VLC）開啟直拍影片<div class="step-sub">搜尋：LE SSERAFIM HOT Sakura 직캠</div></div>
+        </div>
+        <div class="route-step">
+          <div class="step-num">3</div>
+          <div class="step-text">把字幕檔拖進播放視窗，立刻套用<div class="step-sub">歌詞從第 9 秒開始出現，韓中對照</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ 人生啟示 ═══════════════ -->
+  <div class="section-header">
+    <span class="icon">💭</span>
+    <h2>這段旅程教會 NEO 的三件事</h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="insights-grid">
+    <div class="insight-card">
+      <div class="insight-num">01</div>
+      <div class="insight-title">AI 不是萬能的，它需要人來引導</div>
+      <div class="insight-body">AI 會猜錯歌詞、會把字幕時間搞錯，甚至憑空發明根本沒有的歌詞（這叫「幻覺」）。但只要你告訴它正確的歌詞在哪裡，它就能非常準確地把時間對上去。人的判斷力，永遠比工具更重要。</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num">02</div>
+      <div class="insight-title">找到問題，比解決問題更重要</div>
+      <div class="insight-body">我第一次發現字幕有問題，是因為我正在看影片、剛好注意到「I'm burning HOT」這句話唱出來的時間點，和字幕跳出來的時間差了 6 秒。一個細心的觀察，直接指出了接下來要修什麼。</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num">03</div>
+      <div class="insight-title">喜歡一件事，是學習陌生工具的最強動力</div>
+      <div class="insight-body">我完全沒有程式背景，但因為真的很想要這個字幕，我學會了用 AI 分析聲音、處理檔案、甚至把成果放到 GitHub 上公開。喜歡，就是最好的老師。</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ 下載區 ═══════════════ -->
+  <div class="section-header">
+    <span class="icon">📥</span>
+    <h2>直接下載字幕</h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="download-box">
+    <div style="font-size:2.5rem;margin-bottom:12px;">🌸</div>
+    <h3>LE SSERAFIM「HOT」雙語字幕 v7.1</h3>
+    <p>Sakura 個人直拍版 · 韓中雙語 · 43 行完整對齊 · 第 9 秒起跑</p>
+    <div class="dl-btns">
+      <a class="dl-btn primary" href="https://github.com/NEOreload2025/subtitle_project_summary" target="_blank" rel="noopener">
+        🌸 前往 GitHub 下載
+      </a>
+      <a class="dl-btn secondary" href="https://neoreload2025.github.io/subtitle_project_summary/" target="_blank" rel="noopener">
+        🔗 查看完整專案頁面
+      </a>
+    </div>
+    <p style="margin-top:16px;font-size:.8rem;color:var(--muted);">
+      💡 下載後請搭配 PotPlayer、VLC 或 IINA 使用，拖曳字幕檔至播放器視窗即可套用。
+    </p>
+  </div>
+
+  <!-- ═══════════════ 技術深潛（摺疊式） ═══════════════ -->
+  <div class="section-header">
+    <span class="icon">🔬</span>
+    <h2>技術深潛專區</h2>
+    <div class="line"></div>
+    <span class="section-label">給想深入了解的人</span>
+  </div>
+
+  <div class="tech-section">
+    <button class="tech-toggle" id="techToggle" onclick="toggleTech()">
+      <span>⚙️ 展開查看完整技術架構、版本演進與工程發現</span>
+      <span class="arrow" id="techArrow">▾</span>
+    </button>
+    <div class="tech-body" id="techBody">
+
+      <!-- 產線架構 -->
+      <h3 style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:14px;">🏗️ v7.1 最終產線架構</h3>
+      <div class="arch-flow">
+        <div class="arch-step"><div class="a-icon">📺</div><div class="a-num">Step 1</div><div class="a-tool">yt-dlp</div><div class="a-desc">下載直拍 MP3<br/>純淨 YouTube URL</div></div>
+        <div class="arch-step"><div class="a-icon">✂️</div><div class="a-num">Step 2</div><div class="a-tool">Demucs htdemucs</div><div class="a-desc">AI 音軌分離<br/>提煉純人聲</div></div>
+        <div class="arch-step"><div class="a-icon">📝</div><div class="a-num">Step 3</div><div class="a-tool">yt-dlp CC</div><div class="a-desc">擷取官方 MV<br/>韓文 CC 字幕</div></div>
+        <div class="arch-step"><div class="a-icon">✂️</div><div class="a-num">Step 4</div><div class="a-tool">ffmpeg -ss 60</div><div class="a-desc">截切後段音訊<br/>消除累積漂移</div></div>
+        <div class="arch-step"><div class="a-icon">📌</div><div class="a-num">Step 5</div><div class="a-tool">stable-ts align</div><div class="a-desc">強制對齊：前後段<br/>各自獨立對齊縫合</div></div>
+        <div class="arch-step"><div class="a-icon">🌏</div><div class="a-num">Step 6</div><div class="a-tool">AGY 翻譯</div><div class="a-desc">逐行繁體中文<br/>詩意雙語合體</div></div>
+      </div>
+
+      <!-- 版本時間軸 -->
+      <h3 style="font-size:1rem;font-weight:700;color:var(--text);margin:20px 0 14px;">📈 七代版本演進</h3>
+      <div class="tl">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-ver">v1.0</div><div class="tl-title">首次嘗試 — Whisper base + 原始音軌</div><div class="tl-desc">字幕從 28 秒才起跑，前段演唱歌詞全部流失。</div><div class="tl-tags"><span class="tag tag-w">時間軸偏移嚴重</span></div></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-ver">v2.0 / v3.0</div><div class="tl-title">模型升級 — Whisper medium + beam_size=5</div><div class="tl-desc">品質提升，但起始時間仍受舞台雜音影響。</div><div class="tl-tags"><span class="tag tag-p">Whisper medium</span><span class="tag tag-g">initial_prompt 工程</span></div></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-ver">v4.0</div><div class="tl-title">音軌分離突破 — Demucs htdemucs 人聲提煉</div><div class="tl-desc">引入 Meta AI 的 Demucs，強制剝除粉絲尖叫聲與舞台貝斯，驗證半開麥 CD 合成軌的聲學真理。</div><div class="tl-tags"><span class="tag tag-p">Demucs 4.0.1</span><span class="tag tag-g">聲學分離驗證</span></div></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-ver">v5.0</div><div class="tl-title">官方 CC 突破 — yt-dlp 直取韓文字幕</div><div class="tl-desc">發現官方 MV 附帶 CC 字幕，歌詞正確率達 100%。但 MV 與直拍時間軸不同步。</div><div class="tl-tags"><span class="tag tag-n">官方 CC 歌詞 100% 正確</span><span class="tag tag-w">MV vs 直拍不同步</span></div></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-ver">v6.2 🏆</div><div class="tl-title">強制對齊封頂 — stable-ts × 逐字時間軸重建</div><div class="tl-desc">以官方 CC 為正確歌詞，Demucs 純人聲為時間素材，stable-ts 強制對齊取得逐字時間戳。9 秒起跑，43 行完整。</div><div class="tl-tags"><span class="tag tag-n">9 秒起頭</span><span class="tag tag-p">43 行對齊</span></div></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-ver">v7.0</div><div class="tl-title">漂移現形 — 使用者實聽校正</div><div class="tl-desc">「I'm burning HOT」實際在 1:06，v6.2 字幕卻到 1:12 才出現。整首一次對齊會在後半段累積 ~6 秒漂移。</div><div class="tl-tags"><span class="tag tag-w">後段 6 秒漂移</span><span class="tag tag-w">Whisper 幻覺</span></div></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-card"><div class="tl-ver">v7.1 🏆</div><div class="tl-title">分段對齊封頂 — 前段保留 × 後段獨立重對齊</div><div class="tl-desc">前 20 行沿用 v6.2；後段以 ffmpeg 截切，單獨強制對齊，加回偏移後縫合。6 秒漂移歸零。翻譯由 Claude Sonnet 4.6 Thinking 完成。</div><div class="tl-tags"><span class="tag tag-n">6 秒漂移歸零</span><span class="tag tag-p">Claude Sonnet 4.6</span><span class="tag tag-g">ffmpeg 截切縫合</span></div></div></div>
+      </div>
+
+      <!-- 工程發現 -->
+      <h3 style="font-size:1rem;font-weight:700;color:var(--text);margin:20px 0 4px;">💡 關鍵工程發現</h3>
+      <div class="findings-grid">
+        <div class="fc bad"><div class="ft">🎤 半開麥 Live AR 的聲學真理</div><div class="fb">K-POP 現場開場通常是半開麥 CD 合成軌，前段人聲壓進伴奏。即使用 Demucs 分離，前段依然是純伴奏——這是物理事實，不是 AI 能力不足。</div></div>
+        <div class="fc ok"><div class="ft">✅ 強制對齊是最終解法</div><div class="fb">Demucs vocals + 官方 CC 歌詞 → stable-ts.align() 是本工程的終極答案。歌詞準確性由官方保障，時間軸精準度由直拍音訊保障，兩者互不干涉。</div></div>
+        <div class="fc warn"><div class="ft">⚠️ YouTube URL 純淨性守則</div><div class="fb">含有 &list= 參數的 URL 會讓 AI 擷取到其他影片的資訊。務必使用「分享」按鈕產生的純淨 youtu.be/ID 短網址。</div></div>
+        <div class="fc ok"><div class="ft">🧩 分段對齊消除累積漂移</div><div class="fb">整首一次對齊的誤差會累積，後半段可漂移達 6 秒。切成前後兩段各自獨立對齊再縫合，能把累積誤差歸零——這是 v7.1 的核心突破。</div></div>
+        <div class="fc"><div class="ft">🧠 Whisper 模型規格建議</div><div class="fb">base/small 適合乾淨語音；medium 是 K-POP 現場的甜蜜點；large-v3 原版需 10GB VRAM，RTX 3060 裝不下，需改用 faster-whisper 量化版。</div></div>
+        <div class="fc ok"><div class="ft">🔍 MV vs 直拍時間軸差異</div><div class="fb">官方 MV 的 CC 字幕時間軸與現場直拍版本存在結構性差異，無法直接套用。強制對齊是跨越這道鴻溝的唯一橋樑。</div></div>
+      </div>
+
+      <!-- 技術棧 -->
+      <h3 style="font-size:1rem;font-weight:700;color:var(--text);margin:24px 0 12px;">⚙️ 技術棧</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <span class="tag tag-p" style="padding:5px 14px;font-size:.8rem;">yt-dlp</span>
+        <span class="tag tag-p" style="padding:5px 14px;font-size:.8rem;">Demucs 4.0.1 (htdemucs)</span>
+        <span class="tag tag-p" style="padding:5px 14px;font-size:.8rem;">Whisper medium</span>
+        <span class="tag tag-p" style="padding:5px 14px;font-size:.8rem;">stable-ts 2.19.1</span>
+        <span class="tag tag-p" style="padding:5px 14px;font-size:.8rem;">ffmpeg</span>
+        <span class="tag tag-g" style="padding:5px 14px;font-size:.8rem;">Gemini 3.1 Pro High（v1–v6.2）</span>
+        <span class="tag tag-n" style="padding:5px 14px;font-size:.8rem;">Claude Sonnet 4.6 Thinking（v7.x）</span>
+        <span class="tag tag-g" style="padding:5px 14px;font-size:.8rem;">AGY (Antigravity CLI)</span>
+        <span class="tag tag-p" style="padding:5px 14px;font-size:.8rem;">Python 3.x</span>
+        <span class="tag tag-g" style="padding:5px 14px;font-size:.8rem;">RTX 3060 6GB VRAM</span>
+      </div>
+    </div><!-- /tech-body -->
+  </div><!-- /tech-section -->
+
+</div><!-- /container -->
+
+<!-- ═══════════════ 頁尾 ═══════════════ -->
 <footer>
-  <p>生成時間：<strong>2026-06-28</strong> ｜ 工具：<strong>AGY (Antigravity)</strong> × <strong>Gemini 3.1 Pro High（v1~v6.2）</strong> + <strong>Claude Sonnet 4.6 Thinking（v7.0~v7.1）</strong></p>
-  <p style="margin-top:8px;">專案目錄：<strong>/home/hinet/gdrive/youtube_summarizer</strong></p>
+  <div class="sakura-foot">🌸</div>
+  <p>NEO 的字幕計畫 ｜ 製作於 2026 年 6 月</p>
+  <p style="margin-top:6px;">工具：<strong>AGY (Antigravity CLI)</strong> × Gemini 3.1 Pro High × Claude Sonnet 4.6 Thinking</p>
+  <p style="margin-top:6px;">
+    <a href="https://github.com/NEOreload2025/subtitle_project_summary" target="_blank" rel="noopener">GitHub 原始碼</a>
+    ｜ 如果這個對你有幫助，歡迎分享給同樣喜歡 K-pop 的朋友 🎵
+  </p>
 </footer>
+
+<script>
+  // 展開/收合字幕行
+  function toggleRows() {
+    const rows = document.querySelectorAll('.more-rows');
+    const btn = document.getElementById('toggleBtn');
+    const isHidden = rows[0].style.display !== 'table-row';
+    rows.forEach(r => r.style.display = isHidden ? 'table-row' : 'none');
+    btn.textContent = isHidden
+      ? '🌸 收合字幕 ▴'
+      : '🌸 展開查看完整 43 行字幕 ▾';
+  }
+
+  // 展開/收合技術區
+  function toggleTech() {
+    const body  = document.getElementById('techBody');
+    const btn   = document.getElementById('techToggle');
+    const arrow = document.getElementById('techArrow');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    btn.classList.toggle('open', !isOpen);
+    arrow.textContent = isOpen ? '▾' : '▴';
+  }
+</script>
+
 </body>
 </html>

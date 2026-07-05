@@ -55,22 +55,35 @@ class PipelineConfig:
         }
     }
 
-    def __init__(self, profile_name: str = "fancam"):
+    def __init__(self, profile_name: str = "fancam",
+                 audio_path: Optional[str] = None,
+                 prefix_srt: Optional[str] = None,
+                 output_srt: Optional[str] = None,
+                 cut_point_seconds: Optional[float] = None,
+                 video_id: Optional[str] = None):
+        """
+        支援外部參數注入，方便 CLI 驅動（Phase A 改善）。
+        若未提供，則退回原本的硬編碼行為（向後相容）。
+        """
         if profile_name not in self.PROFILES:
             logger.warning(f"未知 Profile: {profile_name}，已預設切換至 'fancam'")
             profile_name = "fancam"
         self.profile_name = profile_name
         self.settings = self.PROFILES[profile_name]
-        self.live_mp3 = "LE_SSERAFIM_HOT.mp3"
-        self.v62_srt = "LE_SSERAFIM_HOT_Forced_Aligned_v62_KR.srt"
-        self.mv_cc_srt = "LE_SSERAFIM_HOT_Official_CC_KR.ko.srt"
-        self.output_srt = f"LE_SSERAFIM_HOT_Hybrid_v8_{profile_name}_KR.srt"
+        self.video_id = video_id
+
+        # 動態路徑（優先使用外部傳入）
+        base = video_id or "LE_SSERAFIM_HOT"
+        self.live_mp3 = audio_path or f"{base}.mp3"
+        self.v62_srt = prefix_srt or f"{base}_Forced_Aligned_v62_KR.srt"
+        self.mv_cc_srt = f"{base}_Official_CC_KR.ko.srt"
+        self.output_srt = output_srt or f"{base}_Hybrid_v8_{profile_name}_KR.srt"
         self.clipped_audio = f"temp_back_section_{profile_name}.mp3"
-        self.demucs_vocal_wav = "separated/htdemucs/LE_SSERAFIM_HOT/vocals.wav"
+        self.demucs_vocal_wav = f"separated/htdemucs/{base}/vocals.wav"
         self.checkpoint_file = f"hybrid_v8_checkpoint_{profile_name}.json"
 
-        # 切割參數
-        self.cut_point_seconds = 63.0  # 1:03 漂移起始點
+        # 切割參數（可外部指定）
+        self.cut_point_seconds = cut_point_seconds if cut_point_seconds is not None else 63.0
         self.clip_start = self.cut_point_seconds - 3.0  # 含 3 秒安全緩衝區
 
 class CheckpointManager:
@@ -131,8 +144,11 @@ def tokenize(line: str) -> List[str]:
 # ============================================================================
 
 class EnterprisePipeline:
-    def __init__(self, profile: str = "fancam"):
-        self.config = PipelineConfig(profile)
+    def __init__(self, profile: str = "fancam", **kwargs):
+        """
+        支援傳入 audio_path, prefix_srt, output_srt, cut_point_seconds, video_id 等參數。
+        """
+        self.config = PipelineConfig(profile, **kwargs)
         self.checkpoint = CheckpointManager(self.config.checkpoint_file)
         logger.info(f"🚀 啟動 AGY Enterprise Pipeline | 模式：{self.config.profile_name}")
         logger.info(f"📖 模式特點：{self.config.settings['description']}")
@@ -224,8 +240,23 @@ class EnterprisePipeline:
                     logger.error("未安裝 stable-ts，請執行 pip install stable-ts")
                     raise
                 
-                # 載入 MV CC 後段歌詞 (已知 21~44 行為 100% 準確之歌詞)
-                back_lyrics = """살게 해 날
+                # 載入後段歌詞：優先從 checkpoint 或外部官方 CC 載入
+                back_lyrics = self.checkpoint.state.get("back_lyrics")
+                if not back_lyrics:
+                    if os.path.exists(self.config.mv_cc_srt):
+                        logger.info(f"從官方 CC 載入後段歌詞：{self.config.mv_cc_srt}")
+                        with open(self.config.mv_cc_srt, 'r', encoding='utf-8') as f:
+                            cc_content = f.read()
+                        # 抽取純文字行（跳過行號與時間軸）
+                        lines = []
+                        for line in cc_content.splitlines():
+                            stripped = line.strip()
+                            if stripped and not stripped[0].isdigit() and '-->' not in stripped:
+                                lines.append(stripped)
+                        back_lyrics = "\n".join(lines)
+                    else:
+                        logger.warning("未提供官方後段歌詞，使用內建熱門範例（建議提供 --audio + 官方 CC）")
+                        back_lyrics = """살게 해 날
 I'm burning HOT
 마치
 영원함 속 날아오를 불사조같이
@@ -348,6 +379,22 @@ I'm burning HOT"""
             raise e
 
 if __name__ == "__main__":
-    profile_choice = sys.argv[1] if len(sys.argv) > 1 else "fancam"
-    pipeline = EnterprisePipeline(profile_choice)
+    import argparse
+    p = argparse.ArgumentParser(description="Enterprise Hybrid Forced Alignment (v8)")
+    p.add_argument("--profile", default="fancam", choices=["fancam", "official_mv"])
+    p.add_argument("--audio", help="音軌檔案路徑")
+    p.add_argument("--prefix-srt", help="前段已對齊的 SRT（用來接 hybrid）")
+    p.add_argument("--output", help="輸出 SRT 檔名")
+    p.add_argument("--cut-point", type=float, help="漂移切點（秒）")
+    p.add_argument("--video-id", help="影片 ID，用來自動產生檔名")
+    args = p.parse_args()
+
+    pipeline = EnterprisePipeline(
+        profile=args.profile,
+        audio_path=args.audio,
+        prefix_srt=args.prefix_srt,
+        output_srt=args.output,
+        cut_point_seconds=args.cut_point,
+        video_id=args.video_id
+    )
     pipeline.run()

@@ -588,6 +588,208 @@
     </button>
   </div>
 
+  <!-- ═══════════════ A 階段升級：一鍵 Python 工具 ═══════════════ -->
+  <div class="section-header">
+    <span class="icon">🚀</span>
+    <h2>現在更簡單了：直接貼網址</h2>
+    <div class="line"></div>
+    <span class="section-label">A 階段新工具</span>
+  </div>
+
+  <div class="card" style="background: linear-gradient(135deg, #FFF8F8, #FFFAF5); border-color: var(--pink-l);">
+    <p style="margin-bottom: 16px; color: var(--text2);">
+      現在只要在網頁輸入 YouTube 網址，它就會幫你產生正確的執行指令。<br>
+      <strong>複製指令後，在你的電腦終端機執行</strong>，Python 腳本才會真正處理影片並輸出 SRT。
+    </p>
+
+    <!-- 互動工具 -->
+    <div style="background:#fff; border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:16px;">
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+        <div style="flex:1; min-width:240px;">
+          <label style="font-size:.75rem; color:var(--muted); display:block; margin-bottom:4px;">YouTube 網址或 ID</label>
+          <input id="tool-url" type="text" value="https://youtu.be/r9AEGPB6qIU" 
+                 style="width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:10px; font-family:monospace; font-size:.9rem;">
+        </div>
+        <div>
+          <label style="font-size:.75rem; color:var(--muted); display:block; margin-bottom:4px;">模式</label>
+          <select id="tool-profile" style="padding:10px 14px; border:1px solid var(--border); border-radius:10px; font-size:.9rem;">
+            <option value="fancam">fancam（個人直拍，建議用 Demucs）</option>
+            <option value="official_mv">official_mv（官方 MV）</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:.75rem; color:var(--muted); display:block; margin-bottom:4px;">方法</label>
+          <select id="tool-method" style="padding:10px 14px; border:1px solid var(--border); border-radius:10px; font-size:.9rem;">
+            <option value="simple">simple（推薦，大多數影片）</option>
+            <option value="hybrid">hybrid（有漂移時使用）</option>
+          </select>
+        </div>
+      </div>
+
+      <button onclick="generateCommand()" 
+              style="background:linear-gradient(135deg,var(--pink),var(--red)); color:white; border:none; padding:10px 20px; border-radius:999px; font-weight:700; cursor:pointer;">
+        生成執行指令
+      </button>
+
+      <div id="command-output" style="display:none; margin-top:16px; background:#f8f1eb; border-radius:10px; padding:14px; font-family:monospace; font-size:.85rem; white-space:pre-wrap; border:1px solid var(--pink-l);">
+      </div>
+    </div>
+
+    <div style="font-size:.82rem; color:var(--muted); line-height:1.6;">
+      <strong>使用方式：</strong><br>
+      1. 在你的電腦上執行 <code>source activate.sh</code><br>
+      2. 複製上面產生的指令直接貼上執行<br>
+      3. 完整步驟、模型選擇、常見問題請看「下方完整製作流程」
+    </div>
+  </div>
+
+  <script>
+    function generateCommand() {
+      const url = document.getElementById('tool-url').value.trim() || 'https://youtu.be/xxxxx';
+      const profile = document.getElementById('tool-profile').value;
+      const method = document.getElementById('tool-method').value;
+
+      let cmd = `python create_bilingual.py --url "${url}" --profile ${profile}`;
+      if (method !== 'simple') cmd += ` --method ${method}`;
+
+      const out = document.getElementById('command-output');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <strong>在終端機執行 STEP 2：</strong><br>
+        <span style="color:#c45c6a;">${cmd}</span><br><br>
+        <button onclick="copyCommand(this)" style="font-size:.75rem;padding:2px 8px;border-radius:6px;border:1px solid var(--pink-l);background:#fff;cursor:pointer;">📋 複製指令</button>
+        <div style="margin-top:10px;font-size:.72rem;color:var(--muted);">
+          跑完後記得做 STEP 3：<code>python bilingualize.py ..._KR.srt --prompt</code><br>
+          然後把 prompt 貼給我產生雙語 SRT。
+        </div>`;
+      out.dataset.cmd = cmd;
+    }
+
+    function copyCommand(btn) {
+      const out = btn.parentElement;
+      navigator.clipboard.writeText(out.dataset.cmd).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '✅ 已複製！';
+        setTimeout(() => { btn.textContent = orig; }, 1800);
+      });
+    }
+  </script>
+
+  <!-- ═══════════════ 完整雙語字幕製作流程 ═══════════════ -->
+  <div class="section-header">
+    <span class="icon">📋</span>
+    <h2>完整製作流程（照順序做）</h2>
+    <div class="line"></div>
+    <span class="section-label">終端機實作 · 不再搞混</span>
+  </div>
+
+  <div class="card" style="background:#fffaf5; border-color:#f0d9cc; margin-bottom:18px;">
+    <div style="display:grid; gap:16px;">
+
+      <div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+          <span style="background:var(--pink); color:white; font-size:.7rem; font-weight:700; padding:2px 8px; border-radius:999px;">STEP 1</span>
+          <strong style="color:var(--text);">啟動專屬環境（每次執行前都要）</strong>
+        </div>
+        <pre style="margin:0; background:#fff; border:1px solid var(--border); padding:10px 12px; border-radius:8px; font-size:.82rem; overflow:auto; line-height:1.4;"><code>cd ~/gdrive/youtube_summarizer
+source activate.sh</code></pre>
+        <div style="font-size:.73rem; color:var(--muted); margin-top:4px;">第一次或很久沒跑請先執行：<code>pip install -r requirements.txt</code></div>
+      </div>
+
+      <div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+          <span style="background:var(--pink); color:white; font-size:.7rem; font-weight:700; padding:2px 8px; border-radius:999px;">STEP 2</span>
+          <strong style="color:var(--text);">產生精準原文 KR.srt（核心）</strong>
+        </div>
+        <pre style="margin:0; background:#fff; border:1px solid var(--border); padding:10px 12px; border-radius:8px; font-size:.82rem; overflow:auto; line-height:1.4;"><code>python create_bilingual.py --url "https://youtu.be/你的影片ID" --profile fancam</code></pre>
+        <div style="font-size:.73rem; color:var(--muted); margin-top:4px;">這一步會自動下載音訊 + 對齊時間軸，輸出 <code>影片名_影片ID_KR.srt</code></div>
+      </div>
+
+      <div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+          <span style="background:var(--pink); color:white; font-size:.7rem; font-weight:700; padding:2px 8px; border-radius:999px;">STEP 3</span>
+          <strong style="color:var(--text);">產生翻譯提示詞</strong>
+        </div>
+        <pre style="margin:0; background:#fff; border:1px solid var(--border); padding:10px 12px; border-radius:8px; font-size:.82rem; overflow:auto; line-height:1.4;"><code>python bilingualize.py 你的影片_KR.srt --prompt > prompt.txt</code></pre>
+        <div style="font-size:.73rem; color:var(--muted); margin-top:4px;">把 <code>prompt.txt</code> 全部內容複製。</div>
+      </div>
+
+      <div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+          <span style="background:var(--green); color:white; font-size:.7rem; font-weight:700; padding:2px 8px; border-radius:999px;">STEP 4</span>
+          <strong style="color:var(--text);">拿到雙語 SRT</strong>
+        </div>
+        <div style="font-size:.85rem; line-height:1.6;">
+          將 prompt.txt 內容貼給 <strong>Grok</strong>（或 Claude / Gemini），直接說：<br>
+          <span style="color:#c45c6a;">「請根據提示產生完整的韓中雙語 SRT」</span><br>
+          複製回傳的內容存成 <code>影片名_Bilingual.srt</code> 即可使用。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 硬體與模型建議 -->
+  <div class="section-header" style="margin-top:4px;">
+    <span class="icon">🖥️</span>
+    <h2>硬體能力決定跑哪個模型</h2>
+    <div class="line"></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
+    <div class="fc ok" style="margin:0;">
+      <div class="ft">⭐ 推薦大多數人（RTX 3060 6GB）</div>
+      <div class="fb">
+        <strong>profile: fancam</strong>（預設）<br>
+        <strong>model: medium</strong>（預設）<br>
+        Demucs + medium 是目前甜蜜點，時間約 15~30 分鐘。<br>
+        large-v3 會吃超過 8~10GB VRAM，容易 OOM。
+      </div>
+    </div>
+    <div class="fc" style="margin:0;">
+      <div class="ft">🚀 硬體較強（8GB+ VRAM）</div>
+      <div class="fb">
+        可以試 <strong>official_mv + large-v3</strong><br>
+        或 fancam 也用 medium 即可（畫質提升有限）。<br>
+        hybrid 模式也比較順。
+      </div>
+    </div>
+    <div class="fc warn" style="margin:0;">
+      <div class="ft">🐢 只有 CPU 或低階顯卡</div>
+      <div class="fb">
+        強烈建議用 <strong>medium</strong>，或先用已處理過的範例檔案練習。<br>
+        執行時間會大幅拉長，Demucs 分離人聲階段特別慢。<br>
+        可以用 <code>--skip-download</code> 重複利用音檔。
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size:.75rem; color:var(--muted); background:#fff; border:1px solid var(--border); padding:10px 14px; border-radius:10px; margin-bottom:26px;">
+    💡 網頁上的「生成執行指令」只會幫你組合 STEP 2 的命令。<br>
+    <strong>實際跑模型、吃硬體資源的過程全部在你自己的電腦終端機完成。</strong>
+  </div>
+
+  <!-- 常見問題 -->
+  <div class="section-header" style="margin-top:4px;">
+    <span class="icon">❓</span>
+    <h2>有問題？先看這裡</h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="card" style="font-size:.85rem; padding:16px 18px; margin-bottom:30px;">
+    <ul style="margin:0; padding-left:18px; line-height:1.75; color:var(--text2);">
+      <li><strong>找不到 activate.sh 或 venv 啟動失敗</strong> → 確認你在 <code>~/gdrive/youtube_summarizer</code> 目錄，並確認 <code>/home/hinet/.venvs/youtube_summarizer</code> 存在。</li>
+      <li><strong>沒有官方 CC 字幕</strong> → 改用 <code>--lang en</code> 或該影片真的沒有韓文字幕，流程會失敗。</li>
+      <li><strong>字幕後半段嚴重漂移</strong> → 用 <code>--method hybrid --prefix-srt 前半段.srt --cut-point 60</code> 分段處理。</li>
+      <li><strong>執行到一半記憶體爆掉 / 很慢</strong> → 降到 medium（或用 <code>--model medium</code>），關閉其他程式，特別是 Demucs 階段。</li>
+      <li><strong>URL 帶 &amp;list= 參數</strong> → 務必用 YouTube「分享」鈕產生的純 <code>youtu.be/xxxxxx</code> 短網址。</li>
+      <li><strong>想重跑但不想重下載音檔</strong> → 加 <code>--skip-download</code> 參數。</li>
+      <li><strong>產生的是純 KR.srt，怎麼變雙語？</strong> → 一定要走 STEP 3 + STEP 4，把 prompt 貼給 LLM。</li>
+    </ul>
+    <div style="margin-top:12px; font-size:.78rem; color:var(--muted);">
+      還是不行？把錯誤訊息 + 你用的 profile/model 貼上來，我幫你看。
+    </div>
+  </div>
+
   <!-- ═══════════════ 工具分工 ═══════════════ -->
   <div class="section-header">
     <span class="icon">🧰</span>

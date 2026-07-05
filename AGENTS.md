@@ -1,6 +1,10 @@
-# AGENTS.md — 雙語字幕工廠 工作守則
+# AGENTS.md — 雙語字幕工廠 工作守則 (Phase C 更新)
 
 > **給 AI 助手(AGY / Antigravity)的指示:**
+> 2026-07-05 起，專案已重構為 `bilingual_subtitle_factory/` 套件結構。
+> 修改前請先確認使用新入口 `create_bilingual.py` 與 `bilingualize.py`。
+
+---
 > 當使用者要在本專案做任何「修改、升級、重跑」之前,**先用下面的守則主動提醒他**,確認方向對了再動手。
 > 這些是這個專案踩過坑、驗證過的結論,別讓使用者重蹈覆轍。
 
@@ -50,4 +54,42 @@ K-pop 現場前奏常是「半開麥 CD 合成軌」,人聲被壓進伴奏裡 �
 - 注意：`torch` 版本需與 CUDA 版本配對（RTX 3060 建議使用 CUDA 12.x）。
 
 ---
-*最後更新:2026-06-28 (v8.0 Production-Ready) | 詳細流程見 `AGY_Bilingual_Subtitle_Workflow_Log.md`*
+*最後更新:2026-07-05 (Phase A+B) | 新增統一 CLI `create_bilingual.py` + `bilingualize.py`
+
+## 🚀 Phase A+B 新用法（推薦）
+
+```bash
+source activate.sh
+
+# 1. 從 URL 一鍵產生原文 KR.srt
+python create_bilingual.py --url "https://youtu.be/你的影片ID" --profile fancam
+
+# 2. 產生高品質翻譯提示詞（直接貼給我）
+python bilingualize.py xxxx_KR.srt --prompt > prompt.txt
+
+# 3. （可選）hybrid 進階模式（需前段 SRT）
+python create_bilingual.py --url "..." --method hybrid --prefix-srt 前段.srt --cut-point 63
+```
+
+詳細請參考 `create_bilingual.py --help` 與 `bilingualize.py --help`。
+
+## 📁 Phase C 套件結構
+
+```
+bilingual_subtitle_factory/
+├── __init__.py
+├── cli.py                 # 主要 create 邏輯
+├── utils.py               # fmt_ts / tokenize / extract_video_id 等
+├── hybrid.py              # 相容層（包裝 hybrid_v8_enterprise）
+└── core/
+    ├── downloader.py
+    ├── cc_extractor.py
+    └── aligner.py
+```
+
+- 新開發請優先在 `bilingual_subtitle_factory/` 內工作
+- 入口腳本 `create_bilingual.py` / `bilingualize.py` 應保持薄包裝
+- hybrid 進階邏輯目前仍依賴根目錄的 `hybrid_v8_enterprise.py`（向後相容）
+- 修改後記得執行 `python test_integration_v8.py` 確認
+
+最後更新: 2026-07-05 (C1 + C2)

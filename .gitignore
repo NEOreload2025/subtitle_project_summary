@@ -2,6 +2,13 @@ venv/
 separated/
 *.mp3
 *.mp4
+*.wav
+*.webm
 *.bak*
 *.tmp
 *.docx
+*.log
+__pycache__/
+*.pyc
+fiction_audio
+hybrid_v8_checkpoint_*.json

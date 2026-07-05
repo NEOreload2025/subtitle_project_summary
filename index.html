@@ -675,6 +675,84 @@
     }
   </script>
 
+  <!-- ═══════════════ 先選路線：檔案類型決策表 ═══════════════ -->
+  <div class="section-header">
+    <span class="icon">🧭</span>
+    <h2>先選路線：你的檔案是哪一種？</h2>
+    <div class="line"></div>
+    <span class="section-label">觀念地圖 · 先分類再動手</span>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px; margin-bottom:16px;">
+    <div class="fc ok" style="margin:0;">
+      <div class="ft">觀念一：難度看「講話還是唱歌」，不是看長度</div>
+      <div class="fb">
+        Whisper 聽<strong>講話</strong>非常準，直接轉就完成。<br>
+        但聽<strong>唱歌</strong>會被伴奏干擾、被唱腔拉長音騙走——
+        所以歌曲才需要 Demucs 分離人聲、才需要借官方歌詞來對齊時間軸。
+      </div>
+    </div>
+    <div class="fc ok" style="margin:0;">
+      <div class="ft">觀念二：分工鐵律——時間軸歸 Whisper 管，翻譯歸 LLM 管</div>
+      <div class="fb">
+        時間軸不準，換再強的 AI 翻譯也救不回來（v7.1 親身驗證）。<br>
+        反過來，轉寫完成後只剩純文字，交給 LLM 翻譯<strong>超省額度</strong>。
+        音檔直接丟給雲端 AI 聽？15 分鐘就能吃掉 40% 免費額度，別做。
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:0; overflow:hidden; margin-bottom:16px;">
+    <div style="overflow-x:auto;">
+      <table class="sub-table">
+        <thead>
+          <tr>
+            <th style="white-space:nowrap;">等級</th>
+            <th style="white-space:nowrap;">檔案類型</th>
+            <th>該走的步驟</th>
+            <th style="white-space:nowrap;">例子</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="white-space:nowrap;"><strong style="color:var(--muted);">0 拋棄式</strong></td>
+            <td>隨便看看、不留檔</td>
+            <td>PotPlayer 即時字幕，看完就丟，不進工廠</td>
+            <td>追劇、看新聞</td>
+          </tr>
+          <tr>
+            <td style="white-space:nowrap;"><strong style="color:var(--green);">1 講話類</strong></td>
+            <td>播客、教學、會議、訪談</td>
+            <td>本機 Whisper 直接轉 → 完成（不需 Demucs、不需對齊）</td>
+            <td>15 分鐘英文演講音檔</td>
+          </tr>
+          <tr>
+            <td style="white-space:nowrap;"><strong style="color:var(--pink);">2 歌曲・有官方歌詞</strong></td>
+            <td>MV / 直拍，YouTube 有 CC 歌詞</td>
+            <td>yt-dlp 抓歌詞 + Demucs 分人聲 + stable-ts 對齊<br><span style="color:var(--muted); font-size:.78rem;">重點：不讓 AI 聽寫歌詞，只借它對時間軸</span></td>
+            <td>LE SSERAFIM「HOT」</td>
+          </tr>
+          <tr>
+            <td style="white-space:nowrap;"><strong style="color:var(--red);">3 歌曲・無官方歌詞</strong></td>
+            <td>冷門歌、現場版</td>
+            <td>Demucs + Whisper 硬聽寫 + 人工逐句校對</td>
+            <td>最累的一級，能避則避</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="font-size:.82rem; color:var(--text2); background:var(--pink-ll); border:1px solid var(--pink-l); padding:12px 16px; border-radius:10px; margin-bottom:12px; line-height:1.7;">
+    🌸 <strong>要雙語的話，任何等級最後都加同一步：</strong>
+    拿轉好的原文 <code>.srt</code> 跑 <code>python bilingualize.py 檔名_KR.srt --prompt</code>，
+    把提示詞貼給 LLM 翻譯合併。這步永遠是純文字，吃的額度極少。
+  </div>
+
+  <div style="text-align:center; font-size:.9rem; color:var(--gold); font-weight:700; margin-bottom:30px; letter-spacing:.05em;">
+    口訣：講話直接轉，唱歌先分聲；有詞用對齊，沒詞才聽寫；翻譯放最後。
+  </div>
+
   <!-- ═══════════════ 完整雙語字幕製作流程 ═══════════════ -->
   <div class="section-header">
     <span class="icon">📋</span>

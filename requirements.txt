@@ -1,5 +1,7 @@
 # ==============================================================================
 # 雙語字幕工廠 - 完整依賴清單 (Production-Ready)
+# 可安裝套件與 CLI 進入點見 pyproject.toml。
+# 本檔 = [project.dependencies] + [project.optional-dependencies].full
 # ==============================================================================
 # 作業系統需求：Linux / WSL2 (Ubuntu 20.04+)
 # Python 版本：>= 3.9
@@ -10,7 +12,7 @@
 yt-dlp>=2024.11.4
 
 # --- YouTube 字幕擷取 ---
-youtube-transcript-api>=0.6.2
+youtube-transcript-api>=0.6.2,<1
 
 # --- Whisper 原版 (OpenAI) ---
 openai-whisper>=20231117

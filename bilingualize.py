@@ -55,7 +55,7 @@ def generate_translation_prompt(blocks, video_title=""):
     return prompt
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description="KR.srt → 雙語提示詞產生器")
     parser.add_argument("input_srt")
     parser.add_argument("--output", "-o")
@@ -63,7 +63,7 @@ def main():
     parser.add_argument("--title", default="")
     parser.add_argument("--format", default="parentheses")
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     input_path = Path(args.input_srt)
     if not input_path.exists():

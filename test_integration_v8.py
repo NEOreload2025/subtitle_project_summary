@@ -12,7 +12,9 @@
   TEST-05  SRT 前段解析邊界值（截止點前後各 1ms 的容差處理）
   TEST-06  後段縫合離群值防呆邏輯（>10 秒長度應觸發線性修正）
   TEST-07  最終 SRT 格式合規性（行號遞增 / 時間軸遞進 / 編碼正確）
+           參考檔 LE_SSERAFIM_HOT_Bilingual_FINAL_v71.srt 不在版本庫時略過
   TEST-08  requirements.txt 完整性驗證（所有核心套件是否正確列出）
+  TEST-09  pyproject 版本 / 進入點，以及 CLI --help（不連網路、不需要 API 金鑰）
 ==============================================================================
 """
 
@@ -231,11 +233,19 @@ class TestOutlierRejection(unittest.TestCase):
 
 # ==============================================================================
 # TEST-07: 最終 SRT 格式合規性
+# 參考檔是本機產線成品，未納入版本庫。缺檔時略過，避免 CI 因不存在的路徑失敗。
 # ==============================================================================
+_SRT_FIXTURE = os.path.join(PROJECT_DIR, "LE_SSERAFIM_HOT_Bilingual_FINAL_v71.srt")
+
+
+@unittest.skipUnless(
+    os.path.exists(_SRT_FIXTURE),
+    "找不到 LE_SSERAFIM_HOT_Bilingual_FINAL_v71.srt（本機產線成品，未納入版本庫）。略過格式合規檢查。",
+)
 class TestSRTFormatCompliance(unittest.TestCase):
 
     def setUp(self):
-        self.srt_path = os.path.join(PROJECT_DIR, "LE_SSERAFIM_HOT_Bilingual_FINAL_v71.srt")
+        self.srt_path = _SRT_FIXTURE
 
     def test_srt_file_exists(self):
         self.assertTrue(os.path.exists(self.srt_path), "最終雙語 SRT 檔案不存在！")
@@ -294,12 +304,80 @@ class TestRequirementsCompleteness(unittest.TestCase):
                 msg=f"requirements.txt 缺少核心套件：{pkg}")
 
 # ==============================================================================
+# TEST-09: 可安裝套件與 CLI（無網路）
+# ==============================================================================
+class TestInstallablePackage(unittest.TestCase):
+
+    def test_pyproject_version_and_entry_points(self):
+        pyproject_path = os.path.join(PROJECT_DIR, "pyproject.toml")
+        init_path = os.path.join(PROJECT_DIR, "bilingual_subtitle_factory", "__init__.py")
+        self.assertTrue(os.path.exists(pyproject_path), "pyproject.toml 不存在！")
+        with open(pyproject_path, "r", encoding="utf-8") as f:
+            pyproject = f.read()
+        with open(init_path, "r", encoding="utf-8") as f:
+            init_src = f.read()
+        self.assertIn('version = "0.8.0"', pyproject)
+        self.assertIn('__version__ = "0.8.0"', init_src)
+        self.assertIn(
+            'create-bilingual = "bilingual_subtitle_factory.cli:main"',
+            pyproject,
+        )
+        self.assertIn('bilingualize = "bilingualize:main"', pyproject)
+        for pkg in ("yt-dlp", "youtube-transcript-api", "openai-whisper", "stable-ts", "demucs", "torch"):
+            self.assertIn(pkg, pyproject, msg=f"pyproject.toml 缺少依賴：{pkg}")
+        req_path = os.path.join(PROJECT_DIR, "requirements.txt")
+        with open(req_path, "r", encoding="utf-8") as f:
+            for line in f:
+                pin = line.strip()
+                if not pin or pin.startswith("#"):
+                    continue
+                self.assertIn(pin, pyproject, msg=f"pyproject.toml 與 requirements.txt 不一致：{pin}")
+
+    def test_create_bilingual_help_and_missing_url(self):
+        try:
+            from bilingual_subtitle_factory.cli import main
+        except ImportError as exc:
+            self.skipTest(f"CLI 依賴未安裝，略過：{exc}")
+        from contextlib import redirect_stderr, redirect_stdout
+        import io
+
+        with redirect_stdout(io.StringIO()) as stdout:
+            with self.assertRaises(SystemExit) as ctx:
+                main(["--help"])
+        self.assertEqual(ctx.exception.code, 0)
+        help_text = stdout.getvalue()
+        self.assertIn("--url", help_text)
+        self.assertIn("--profile", help_text)
+        self.assertIn("fancam", help_text)
+
+        with redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit) as ctx:
+                main([])
+        self.assertEqual(ctx.exception.code, 2)
+
+    def test_bilingualize_help_and_missing_file(self):
+        import bilingualize
+        from contextlib import redirect_stderr, redirect_stdout
+        import io
+
+        with redirect_stdout(io.StringIO()) as stdout:
+            with self.assertRaises(SystemExit) as ctx:
+                bilingualize.main(["--help"])
+        self.assertEqual(ctx.exception.code, 0)
+        self.assertIn("--prompt", stdout.getvalue())
+
+        with redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit) as ctx:
+                bilingualize.main(["/tmp/does-not-exist-bilingual-factory.srt", "--prompt"])
+        self.assertEqual(ctx.exception.code, 1)
+
+# ==============================================================================
 # 主執行入口
 # ==============================================================================
 if __name__ == "__main__":
     print("=" * 70)
     print("  🧪 AGY 雙語字幕工廠 - 企業級整合測試套件 v1.0")
-    print("  覆蓋範圍：時間軸 / Tokenize / Checkpoint / Profile / 格式合規 / Requirements")
+    print("  覆蓋範圍：時間軸 / Tokenize / Checkpoint / Profile / 格式合規 / Requirements / CLI")
     print("=" * 70)
 
     loader = unittest.TestLoader()
@@ -314,6 +392,7 @@ if __name__ == "__main__":
         TestOutlierRejection,
         TestSRTFormatCompliance,
         TestRequirementsCompleteness,
+        TestInstallablePackage,
     ]
 
     for tc in test_classes:

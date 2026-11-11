@@ -16,7 +16,7 @@
     create_from_url("https://youtu.be/xxxxx", profile="fancam")
 """
 
-__version__ = "0.8.0"  # Phase C package version
+__version__ = "0.8.0"  # Phase C package version; keep in sync with pyproject.toml
 
 from .utils import (
     extract_video_id,

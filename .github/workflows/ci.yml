@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: install, import, test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install .
+
+      - name: Import check
+        run: |
+          python -m compileall -q -f bilingual_subtitle_factory create_bilingual.py bilingualize.py hybrid_v8_enterprise.py test_integration_v8.py
+          work="$(mktemp -d)"
+          cd "$work"
+          python - <<'PY'
+          import importlib
+          import os
+
+          repo = os.path.realpath(os.environ["GITHUB_WORKSPACE"])
+          modules = [
+              "bilingual_subtitle_factory",
+              "bilingual_subtitle_factory.cli",
+              "bilingual_subtitle_factory.utils",
+              "bilingual_subtitle_factory.hybrid",
+              "bilingual_subtitle_factory.core",
+              "bilingual_subtitle_factory.core.downloader",
+              "bilingual_subtitle_factory.core.cc_extractor",
+              "bilingual_subtitle_factory.core.aligner",
+              "bilingualize",
+              "hybrid_v8_enterprise",
+          ]
+          for name in modules:
+              module = importlib.import_module(name)
+              location = os.path.realpath(module.__file__)
+              print(f"imported {name} from {location}")
+              if os.path.commonpath([location, repo]) == repo:
+                  raise SystemExit(
+                      f"{name} resolved inside the checkout ({location}); expected the installed copy"
+                  )
+          import bilingual_subtitle_factory
+
+          if bilingual_subtitle_factory.__version__ != "0.8.0":
+              raise SystemExit(
+                  f"unexpected version {bilingual_subtitle_factory.__version__}"
+              )
+          PY
+          create-bilingual --help
+          bilingualize --help
+          python -m bilingual_subtitle_factory --help
+
+      - name: Run tests
+        run: python test_integration_v8.py

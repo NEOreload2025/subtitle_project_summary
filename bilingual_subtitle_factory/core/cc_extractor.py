@@ -5,6 +5,7 @@
 import logging
 from typing import List, Optional, Tuple
 
+# 0.6 API：get_transcript / list_transcripts。1.x 拿掉了這兩個類別方法，故安裝範圍鎖在 <1。
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import SRTFormatter
 

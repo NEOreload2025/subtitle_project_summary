@@ -86,3 +86,13 @@ python bilingualize.py 你的影片_KR.srt --prompt > prompt.txt
 ## 授權與致謝
 
 個人專案，歡迎參考。核心技術致謝 stable-ts、yt-dlp、youtube-transcript-api 以及所有測試過的 K-pop 直拍影片。
+
+## 網站（Cloudflare Pages）
+
+線上版：https://subtitle-project-summary.pages.dev/
+
+此 repo 同時是 Python 工具與靜態故事頁。**Cloudflare Pages 只發布網站檔**（HTML），不會上傳 `.py`、測試、`requirements.txt`、`README.md` 或 `activate.sh`。
+
+發布範圍由 `scripts/pages-allowlist.txt` 定義。執行 `scripts/prepare-pages-site.sh` 會把允許的檔案複製到 `site/`（網站根路徑為 `/`，不是 `/subtitle_project_summary/`）。
+
+GitHub Pages（尚未關閉）目前仍從 `main` 根目錄發布整個 repo；是否關閉或改為只發布 `site/`，由倉庫擁有者決定。合併本 PR 不會自動部署到 Cloudflare。

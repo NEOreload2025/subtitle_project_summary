@@ -1,0 +1,4 @@
+# Files published to Cloudflare Pages. Python, tests, docs, and shell
+# scripts are intentionally excluded so they are not served on the public site.
+index.html
+subtitle_project_summary.html
